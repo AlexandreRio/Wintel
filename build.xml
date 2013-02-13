@@ -1,0 +1,89 @@
+<project name="Wintel" default="help" basedir=".">
+  <property name="jarName" value="Rio_Alexandre_Wintel"/>
+  <!--<property name="testClassName" value="datas.testAnnuaire"/>-->
+  <property name="testClassName" value="ihm.Wintel"/>
+  <!--<property name="testClassName" value="datas.testTableFiches"/>-->
+  <property name="jarUserName" value="APJar"/>
+  <property name="TPName" value="AP"/>
+
+  <target name="init">
+    <mkdir dir="build/"/>
+    <mkdir dir="doc/"/>
+    <mkdir dir="src/"/>
+    <mkdir dir="data/"/>
+    <mkdir dir="ww/"/>
+    <mkdir dir="rendu/"/>
+  </target>
+
+  <target name="clean">
+    <delete dir="build"/>
+    <mkdir dir="build/"/>
+  </target>
+
+  <target name="javadoc" depends="init">
+    <mkdir dir="doc"/>
+    <javadoc destdir="doc/">
+      <fileset dir="src/" includes="**/*.java"/>
+    </javadoc>
+  </target>
+
+  <target name="fullCompile" depends="init, count ,clean">
+    <mkdir dir="build/classes"/>
+    <javac srcdir="src" destdir="build/classes" classpath="lib/junit-4.8.2.jar" includeantruntime="false" fork="true" />
+  </target>
+
+  <target name="quickCompile" depends="init, count">
+    <mkdir dir="build/classes"/>
+    <javac srcdir="src/" destdir="build/classes" classpath="lib/junit-4.8.2.jar" includeantruntime="false" fork="true" />
+  </target>
+
+  <target name="zip" depends="javadoc, quickCompile">
+    <delete dir="rendu/*.zip"/>
+    <zip destfile="rendu/${TPName}_Rio_Alexandre.zip" basedir="." excludes="class/**,
+      **/*.sw*, rendu/**, *.zip"
+    />
+  </target>
+
+  <target name="count" >
+     <echo message="Number of code lines: "/>
+     <exec executable="bash">
+	<arg value="-c"/>
+	<arg value="cat src/*/*.java | wc -l"/>
+      </exec>
+  </target>
+
+  <target name="jar" depends="quickCompile">
+    <mkdir dir="build/jar"/>
+    <jar destfile="build/jar/${jarUserName}.jar" basedir="build/classes">
+      <manifest>
+	<attribute name="Main-Class" value="${testClassName}"/>
+      </manifest>
+    </jar>
+  </target>
+
+  <target name="all" depends="run, zip">
+  </target>
+
+  <target name="testJUnit" depends="quickCompile">
+    <junit printsummary="yes" haltonerror="false" haltonfailure="false" showoutput="yes">
+      <classpath>
+	<pathelement location="build/classes"/>
+      </classpath>
+      <test name="datas.AnnuaireTest"/>
+    </junit>
+  </target>
+
+  <target name="run" depends="jar">
+    <java jar="build/jar/${jarUserName}.jar" fork="true"/>
+  </target>
+
+  <target name="help">
+    <echo message="Projet Wintel | Rio Alexandre"/>
+    <echo message="Voici les commandes les plus utiles:"/>
+    <echo message="* ant help           affiche l'aide"/>
+    <echo message="* ant quickCompile   recompile les sources"/>
+    <echo message="* ant run            execute le programme Wintel"/>
+    <echo message="* ant testJUnit      execute la classe de test avec JUnit"/>
+  </target>
+
+</project>
